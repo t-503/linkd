@@ -115,13 +115,13 @@ body {
     gap: 1rem;
 }
 
-/* Donate Button - NEW */
+/* Donate Button - FIXED */
 .donate-btn {
     display: flex;
     align-items: center;
     gap: 0.5rem;
     padding: 0.75rem 1.5rem;
-    background: var(--gradient-heart);
+    background: linear-gradient(135deg, #e91e63 0%, #ad1457 100%);
     border: none;
     border-radius: var(--radius-sm);
     color: white;
@@ -131,6 +131,8 @@ body {
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
+    text-decoration: none;
+    font-family: inherit;
 }
 
 .donate-btn::before {
@@ -151,10 +153,16 @@ body {
 .donate-btn:hover {
     transform: translateY(-2px);
     box-shadow: var(--shadow-lg);
+    background: linear-gradient(135deg, #c2185b 0%, #880e4f 100%);
+}
+
+.donate-btn:active {
+    transform: translateY(0);
 }
 
 .donate-btn i {
     animation: heartbeat 1.5s ease-in-out infinite;
+    font-size: 1rem;
 }
 
 @keyframes heartbeat {
@@ -232,7 +240,7 @@ body {
     transition: all 0.3s ease;
 }
 
-/* Modal Styles - NEW */
+/* Modal Styles - FIXED */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -263,6 +271,7 @@ body {
     max-height: 90vh;
     overflow: hidden;
     animation: slideUp 0.3s ease;
+    border: 1px solid var(--border-color);
 }
 
 @keyframes slideUp {
@@ -282,7 +291,7 @@ body {
     align-items: center;
     padding: 1.5rem 2rem;
     border-bottom: 1px solid var(--border-color);
-    background: var(--gradient-heart);
+    background: linear-gradient(135deg, #e91e63 0%, #ad1457 100%);
     color: white;
 }
 
@@ -292,6 +301,7 @@ body {
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    margin: 0;
 }
 
 .modal-close {
@@ -303,6 +313,11 @@ body {
     padding: 0.5rem;
     border-radius: var(--radius-sm);
     transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
 }
 
 .modal-close:hover {
@@ -318,6 +333,7 @@ body {
     margin-bottom: 1.5rem;
     color: var(--text-secondary);
     font-size: 1rem;
+    line-height: 1.6;
 }
 
 .wallet-section {
@@ -344,6 +360,7 @@ body {
     margin-bottom: 1rem;
     position: relative;
     transition: all 0.3s ease;
+    cursor: pointer;
 }
 
 .wallet-address:hover {
@@ -365,12 +382,18 @@ body {
     transition: all 0.3s ease;
     width: 100%;
     justify-content: center;
+    font-size: 0.95rem;
+    font-family: inherit;
 }
 
 .copy-wallet-btn:hover {
     background: var(--accent-hover);
     transform: translateY(-2px);
     box-shadow: var(--shadow-md);
+}
+
+.copy-wallet-btn:active {
+    transform: translateY(0);
 }
 
 .donation-note {
@@ -382,11 +405,13 @@ body {
     border-radius: var(--radius-sm);
     color: var(--text-secondary);
     font-size: 0.9rem;
+    border: 1px solid var(--border-color);
 }
 
 .donation-note i {
     color: var(--accent-color);
     font-size: 1.1rem;
+    flex-shrink: 0;
 }
 
 /* Add Site Box */
@@ -407,7 +432,7 @@ body {
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
     transition: left 2s ease-in-out;
     animation: shimmer 3s infinite;
 }
@@ -490,7 +515,6 @@ body {
     font-size: 1.1rem;
 }
 
-/* Rest of the existing CSS remains the same... */
 /* Filters Section */
 .filters-section {
     background: var(--bg-card);
@@ -970,18 +994,13 @@ body {
     }
 }
 
-/* Smooth scroll behavior */
 html {
     scroll-behavior: smooth;
 }
-
-/* Selection styles */
 ::selection {
     background: var(--accent-color);
     color: white;
 }
-
-/* Scrollbar styles */
 ::-webkit-scrollbar {
     width: 8px;
 }
