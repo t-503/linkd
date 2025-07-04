@@ -21,7 +21,7 @@ class LinkDirectory {
     
     async loadLinks() {
         try {
-         const response = await fetch('https://raw.githubusercontent.com/t-503/tar/main/tar.json');
+         const response = await fetch('https://raw.githubusercontent.com/ayhan-dev/linkdirectory/main/tar.json');
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
