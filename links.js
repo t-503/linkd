@@ -28,7 +28,6 @@ class LinkDirectory {
 
         this.links = await response.json();
         this.filteredLinks = [...this.links];
-        console.log(`Loaded ${this.links.length} links from GitHub`);
     } catch (error) {
         console.error('Error loading links from GitHub:', error);
         this.links = [];
