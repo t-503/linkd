@@ -18,31 +18,25 @@ class LinkDirectory {
         this.renderLinks();
         this.hideLoading();
     }
-    
     async loadLinks() {
-        try {
-            const response = await fetch('https://raw.githubusercontent.com/ayhan-dev/linkdirectory/main/tar.json');
-            
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            this.links = await response.json();
-            this.filteredLinks = [...this.links];
-        } catch (error) {
-            console.error('Error loading links from GitHub:', error);
-            try {
-                const fallbackResponse = await fetch('links.json');
-                this.links = await fallbackResponse.json();
-                this.filteredLinks = [...this.links];
-                console.log(`Loaded ${this.links.length} links from local fallback`);
-            } catch (fallbackError) {
-                console.error('Error loading fallback links:', fallbackError);
-                this.links = [];
-                this.filteredLinks = [];
-                this.showToast('Failed to load links. Please check your connection.');
-            }
+    try {
+        const response = await fetch('https://raw.githubusercontent.com/ayhan-dev/linkdirectory/main/tar.json');
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
+
+        this.links = await response.json();
+        this.filteredLinks = [...this.links];
+        console.log(`Loaded ${this.links.length} links from GitHub`);
+    } catch (error) {
+        console.error('Error loading links from GitHub:', error);
+        this.links = [];
+        this.filteredLinks = [];
+        this.showToast?.('Failed to load links. Please check your connection or try again later.');
     }
+}
+
     setupEventListeners() {
         const themeToggle = document.getElementById('themeToggle');
         themeToggle.addEventListener('click', this.toggleTheme.bind(this));
