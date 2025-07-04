@@ -112,10 +112,8 @@ class LinkDirectory {
     handleInitialHash() {
         const savedTheme = localStorage.getItem('theme') || 'light';
         document.documentElement.setAttribute('data-theme', savedTheme);
-        
         const themeIcon = document.querySelector('.theme-toggle i');
         themeIcon.className = savedTheme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
-        
         this.handleHashChange();
     }
     
@@ -135,13 +133,11 @@ class LinkDirectory {
     
     handleCategoryFilter(category) {
         this.currentCategory = category;
-        
         if (category === 'all') {
             window.location.hash = '';
         } else {
             window.location.hash = category;
         }
-        
         this.filterLinks();
         this.updateCategoryButtons();
     }
@@ -152,11 +148,9 @@ class LinkDirectory {
         } else {
             this.currentTags.add(tag);
         }
-        
         this.filterLinks();
         this.updateTagButtons();
     }
-    
     filterLinks() {
         this.filteredLinks = this.links.filter(link => {
             const categoryMatch = this.currentCategory === 'all' || 
@@ -186,51 +180,39 @@ class LinkDirectory {
                 ${this.getCategoryIcon(category)} ${this.capitalize(category)}
             </button>
         `).join('');
-        
-        // Add event listeners
         categoryFilters.addEventListener('click', (e) => {
             if (e.target.classList.contains('filter-btn')) {
                 this.handleCategoryFilter(e.target.dataset.category);
             }
         });
     }
-    
     renderTags() {
         const allTags = [...new Set(this.links.flatMap(link => link.tags))];
         const tagFilters = document.getElementById('tagFilters');
-        
         tagFilters.innerHTML = allTags.map(tag => `
             <button class="tag-btn ${this.currentTags.has(tag) ? 'active' : ''}" 
                     data-tag="${tag}">
                 #${tag}
             </button>
         `).join('');
-        
-        // Add event listeners
         tagFilters.addEventListener('click', (e) => {
             if (e.target.classList.contains('tag-btn')) {
                 this.handleTagFilter(e.target.dataset.tag);
             }
         });
     }
-    
     renderLinks() {
         const linksGrid = document.getElementById('linksGrid');
         const emptyState = document.getElementById('emptyState');
-        
         if (this.filteredLinks.length === 0) {
             linksGrid.style.display = 'none';
             emptyState.style.display = 'block';
             return;
         }
-        
         linksGrid.style.display = 'grid';
         emptyState.style.display = 'none';
-        
-        // Fade out existing cards
         const existingCards = linksGrid.querySelectorAll('.link-card');
         existingCards.forEach(card => card.classList.add('fade-out'));
-        
         setTimeout(() => {
             linksGrid.innerHTML = this.filteredLinks.map((link, index) => `
                 <div class="link-card" style="animation-delay: ${index * 0.1}s">
@@ -257,21 +239,18 @@ class LinkDirectory {
             `).join('');
         }, 150);
     }
-    
     updateCategoryButtons() {
         const buttons = document.querySelectorAll('.filter-btn');
         buttons.forEach(btn => {
             btn.classList.toggle('active', btn.dataset.category === this.currentCategory);
         });
     }
-    
     updateTagButtons() {
         const buttons = document.querySelectorAll('.tag-btn');
         buttons.forEach(btn => {
             btn.classList.toggle('active', this.currentTags.has(btn.dataset.tag));
         });
     }
-    
     getCategoryIcon(category) {
         const icons = {
             all: '<i class="fas fa-globe"></i>',
@@ -291,7 +270,6 @@ class LinkDirectory {
     capitalize(str) {
         return str.charAt(0).toUpperCase() + str.slice(1);
     }
-    
     async copyLink(url) {
         try {
             await navigator.clipboard.writeText(url);
@@ -301,7 +279,6 @@ class LinkDirectory {
             this.showToast('Failed to copy link ❌');
         }
     }
-    
     showToast(message) {
         const toast = document.createElement('div');
         toast.innerHTML = `<i class="fas fa-check-circle"></i> ${message}`;
@@ -321,9 +298,7 @@ class LinkDirectory {
             gap: 0.5rem;
             font-weight: 600;
         `;
-        
         document.body.appendChild(toast);
-        
         setTimeout(() => {
             toast.style.animation = 'slideOutRight 0.3s ease';
             setTimeout(() => toast.remove(), 300);
