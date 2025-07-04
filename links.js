@@ -21,19 +21,22 @@ class LinkDirectory {
     
     async loadLinks() {
         try {
-         const response = await fetch('https://raw.githubusercontent.com/ayhan-dev/linkdirectory/main/tar.json');
+            const response = await fetch('https://raw.githubusercontent.com/ayhan-dev/linkdirectory/main/links.json');
+            
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             this.links = await response.json();
             this.filteredLinks = [...this.links];
         } catch (error) {
-            console.error(error);
+            console.error('Error loading links from GitHub:', error);
             try {
                 const fallbackResponse = await fetch('links.json');
                 this.links = await fallbackResponse.json();
                 this.filteredLinks = [...this.links];
+                console.log(`Loaded ${this.links.length} links from local fallback`);
             } catch (fallbackError) {
+                console.error('Error loading fallback links:', fallbackError);
                 this.links = [];
                 this.filteredLinks = [];
                 this.showToast('Failed to load links. Please check your connection.');
@@ -51,22 +54,71 @@ class LinkDirectory {
                 this.copyLink(e.target.dataset.url);
             }
         });
+        const donateBtn = document.getElementById('donateBtn');
+        const donateModal = document.getElementById('donateModal');
+        const closeModal = document.getElementById('closeModal');
+        const copyWalletBtn = document.getElementById('copyWalletBtn');
+
+        donateBtn.addEventListener('click', () => {
+            donateModal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        });
+
+        closeModal.addEventListener('click', () => {
+            donateModal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        });
+        donateModal.addEventListener('click', (e) => {
+            if (e.target === donateModal) {
+                donateModal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        });
+        copyWalletBtn.addEventListener('click', () => {
+            const walletAddress = document.getElementById('walletAddress').textContent;
+            navigator.clipboard.writeText(walletAddress).then(() => {
+                copyWalletBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                copyWalletBtn.style.background = 'var(--success-color)';
+                
+                setTimeout(() => {
+                    copyWalletBtn.innerHTML = '<i class="fas fa-copy"></i> Copy Address';
+                    copyWalletBtn.style.background = 'var(--accent-color)';
+                }, 2000);
+                
+                this.showToast('Wallet address copied to clipboard! 💰');
+            }).catch(() => {
+                this.showToast('Failed to copy wallet address ❌');
+            });
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && donateModal.style.display === 'flex') {
+                donateModal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        });
     }
+    
     toggleTheme() {
         const currentTheme = document.documentElement.getAttribute('data-theme');
         const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        
         document.documentElement.setAttribute('data-theme', newTheme);
         localStorage.setItem('theme', newTheme);
+        
         const themeIcon = document.querySelector('.theme-toggle i');
         themeIcon.className = newTheme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
     }
+    
     handleInitialHash() {
         const savedTheme = localStorage.getItem('theme') || 'light';
         document.documentElement.setAttribute('data-theme', savedTheme);
+        
         const themeIcon = document.querySelector('.theme-toggle i');
-        themeIcon.className = savedTheme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';   
+        themeIcon.className = savedTheme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+        
         this.handleHashChange();
     }
+    
     handleHashChange() {
         const hash = window.location.hash.slice(1);
         if (hash) {
@@ -75,29 +127,36 @@ class LinkDirectory {
             this.updateCategoryButtons();
         }
     }
+    
     handleSearch(e) {
         this.searchQuery = e.target.value.toLowerCase();
         this.filterLinks();
     }
+    
     handleCategoryFilter(category) {
         this.currentCategory = category;
+        
         if (category === 'all') {
             window.location.hash = '';
         } else {
             window.location.hash = category;
         }
+        
         this.filterLinks();
         this.updateCategoryButtons();
     }
+    
     handleTagFilter(tag) {
         if (this.currentTags.has(tag)) {
             this.currentTags.delete(tag);
         } else {
             this.currentTags.add(tag);
         }
+        
         this.filterLinks();
         this.updateTagButtons();
     }
+    
     filterLinks() {
         this.filteredLinks = this.links.filter(link => {
             const categoryMatch = this.currentCategory === 'all' || 
@@ -110,52 +169,68 @@ class LinkDirectory {
                               link.title.toLowerCase().includes(this.searchQuery) ||
                               link.description.toLowerCase().includes(this.searchQuery) ||
                               link.tags.some(tag => tag.toLowerCase().includes(this.searchQuery));
+            
             return categoryMatch && tagMatch && searchMatch;
         });
+        
         this.renderLinks();
     }
+    
     renderCategories() {
         const categories = ['all', ...new Set(this.links.map(link => link.category))];
         const categoryFilters = document.getElementById('categoryFilters');
+        
         categoryFilters.innerHTML = categories.map(category => `
             <button class="filter-btn ${category === this.currentCategory ? 'active' : ''}" 
                     data-category="${category}">
                 ${this.getCategoryIcon(category)} ${this.capitalize(category)}
             </button>
         `).join('');
+        
+        // Add event listeners
         categoryFilters.addEventListener('click', (e) => {
             if (e.target.classList.contains('filter-btn')) {
                 this.handleCategoryFilter(e.target.dataset.category);
             }
         });
     }
+    
     renderTags() {
         const allTags = [...new Set(this.links.flatMap(link => link.tags))];
         const tagFilters = document.getElementById('tagFilters');
+        
         tagFilters.innerHTML = allTags.map(tag => `
             <button class="tag-btn ${this.currentTags.has(tag) ? 'active' : ''}" 
                     data-tag="${tag}">
                 #${tag}
             </button>
         `).join('');
+        
+        // Add event listeners
         tagFilters.addEventListener('click', (e) => {
             if (e.target.classList.contains('tag-btn')) {
                 this.handleTagFilter(e.target.dataset.tag);
             }
         });
     }
+    
     renderLinks() {
         const linksGrid = document.getElementById('linksGrid');
         const emptyState = document.getElementById('emptyState');
+        
         if (this.filteredLinks.length === 0) {
             linksGrid.style.display = 'none';
             emptyState.style.display = 'block';
             return;
         }
+        
         linksGrid.style.display = 'grid';
         emptyState.style.display = 'none';
+        
+        // Fade out existing cards
         const existingCards = linksGrid.querySelectorAll('.link-card');
         existingCards.forEach(card => card.classList.add('fade-out'));
+        
         setTimeout(() => {
             linksGrid.innerHTML = this.filteredLinks.map((link, index) => `
                 <div class="link-card" style="animation-delay: ${index * 0.1}s">
@@ -182,18 +257,21 @@ class LinkDirectory {
             `).join('');
         }, 150);
     }
+    
     updateCategoryButtons() {
         const buttons = document.querySelectorAll('.filter-btn');
         buttons.forEach(btn => {
             btn.classList.toggle('active', btn.dataset.category === this.currentCategory);
         });
     }
+    
     updateTagButtons() {
         const buttons = document.querySelectorAll('.tag-btn');
         buttons.forEach(btn => {
             btn.classList.toggle('active', this.currentTags.has(btn.dataset.tag));
         });
     }
+    
     getCategoryIcon(category) {
         const icons = {
             all: '<i class="fas fa-globe"></i>',
@@ -209,9 +287,11 @@ class LinkDirectory {
         };
         return icons[category.toLowerCase()] || '<i class="fas fa-folder"></i>';
     }
+    
     capitalize(str) {
         return str.charAt(0).toUpperCase() + str.slice(1);
     }
+    
     async copyLink(url) {
         try {
             await navigator.clipboard.writeText(url);
@@ -221,6 +301,7 @@ class LinkDirectory {
             this.showToast('Failed to copy link ❌');
         }
     }
+    
     showToast(message) {
         const toast = document.createElement('div');
         toast.innerHTML = `<i class="fas fa-check-circle"></i> ${message}`;
@@ -240,7 +321,9 @@ class LinkDirectory {
             gap: 0.5rem;
             font-weight: 600;
         `;
-        document.body.appendChild(toast);   
+        
+        document.body.appendChild(toast);
+        
         setTimeout(() => {
             toast.style.animation = 'slideOutRight 0.3s ease';
             setTimeout(() => toast.remove(), 300);
@@ -257,7 +340,7 @@ style.textContent = `
         from { transform: translateX(100%); opacity: 0; }
         to { transform: translateX(0); opacity: 1; }
     }
-    
+
     @keyframes slideOutRight {
         from { transform: translateX(0); opacity: 1; }
         to { transform: translateX(100%); opacity: 0; }
@@ -265,4 +348,3 @@ style.textContent = `
 `;
 document.head.appendChild(style);
 const linkDirectory = new LinkDirectory();
-
