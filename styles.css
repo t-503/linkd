@@ -121,7 +121,7 @@ body {
     align-items: center;
     gap: 0.5rem;
     padding: 0.75rem 1.5rem;
-    background: linear-gradient(135deg, #e91e63 0%, #ad1457 100%);
+    background: var(--gradient-heart);
     border: none;
     border-radius: var(--radius-sm);
     color: white;
@@ -133,6 +133,7 @@ body {
     overflow: hidden;
     text-decoration: none;
     font-family: inherit;
+    outline: none;
 }
 
 .donate-btn::before {
@@ -153,7 +154,7 @@ body {
 .donate-btn:hover {
     transform: translateY(-2px);
     box-shadow: var(--shadow-lg);
-    background: linear-gradient(135deg, #c2185b 0%, #880e4f 100%);
+    background: linear-gradient(135deg, #ad1457 0%, #880e4f 100%);
 }
 
 .donate-btn:active {
@@ -248,13 +249,17 @@ body {
     right: 0;
     bottom: 0;
     background: rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(5px);
-    z-index: 1000;
-    display: flex;
+    backdrop-filter: blur(8px);
+    z-index: 9999;
+    display: none;
     align-items: center;
     justify-content: center;
     padding: 20px;
     animation: fadeIn 0.3s ease;
+}
+
+.modal-overlay.show {
+    display: flex !important;
 }
 
 @keyframes fadeIn {
@@ -291,7 +296,7 @@ body {
     align-items: center;
     padding: 1.5rem 2rem;
     border-bottom: 1px solid var(--border-color);
-    background: linear-gradient(135deg, #e91e63 0%, #ad1457 100%);
+    background: var(--gradient-heart);
     color: white;
 }
 
@@ -313,11 +318,11 @@ body {
     padding: 0.5rem;
     border-radius: var(--radius-sm);
     transition: all 0.2s ease;
+    width: 32px;
+    height: 32px;
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 36px;
-    height: 36px;
 }
 
 .modal-close:hover {
@@ -352,7 +357,7 @@ body {
     background: var(--bg-secondary);
     border: 2px solid var(--border-color);
     border-radius: var(--radius-sm);
-    padding: 1rem;
+    padding: 1rem 1.25rem;
     font-family: 'Courier New', monospace;
     font-size: 0.9rem;
     color: var(--text-primary);
@@ -360,7 +365,7 @@ body {
     margin-bottom: 1rem;
     position: relative;
     transition: all 0.3s ease;
-    cursor: pointer;
+    line-height: 1.4;
 }
 
 .wallet-address:hover {
@@ -382,7 +387,7 @@ body {
     transition: all 0.3s ease;
     width: 100%;
     justify-content: center;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     font-family: inherit;
 }
 
@@ -398,19 +403,21 @@ body {
 
 .donation-note {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 0.75rem;
-    padding: 1rem;
+    padding: 1rem 1.25rem;
     background: var(--bg-secondary);
     border-radius: var(--radius-sm);
     color: var(--text-secondary);
     font-size: 0.9rem;
+    line-height: 1.5;
     border: 1px solid var(--border-color);
 }
 
 .donation-note i {
     color: var(--accent-color);
     font-size: 1.1rem;
+    margin-top: 0.1rem;
     flex-shrink: 0;
 }
 
@@ -897,7 +904,10 @@ body {
         padding: 1.5rem;
     }
     
-    /* Add Site Box Mobile */
+    .modal-header {
+        padding: 1.25rem 1.5rem;
+    }
+    
     .add-site-content {
         flex-direction: column;
         text-align: center;
@@ -991,16 +1001,26 @@ body {
     .donate-btn {
         padding: 0.5rem 0.75rem;
         font-size: 0.75rem;
+        gap: 0.25rem;
+    }
+    
+    .header-actions {
+        gap: 0.5rem;
     }
 }
 
+/* Smooth scroll behavior */
 html {
     scroll-behavior: smooth;
 }
+
+/* Selection styles */
 ::selection {
     background: var(--accent-color);
     color: white;
 }
+
+/* Scrollbar styles */
 ::-webkit-scrollbar {
     width: 8px;
 }
