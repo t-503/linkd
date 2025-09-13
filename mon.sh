@@ -9,7 +9,8 @@ get_stats() {
   PORTS=$(ss -tuln | awk 'NR>1 {print $1":"$5}' | paste -sd "," -)
   NETSTAT=$(ip -4 addr show | grep inet | awk '{print $2}' | paste -sd "," -)
   GPU=$(lspci 2>/dev/null | grep -i vga | awk -F': ' '{print $2}' | paste -sd "," -)
-   echo -e "HTTP/1.1 200 OK\nContent-Type: application/json\n"
+
+  echo -e "HTTP/1.1 200 OK\nContent-Type: application/json\n"
 
   cat <<EOF
 {
@@ -22,14 +23,15 @@ get_stats() {
   "uptime": "${UPTIME}",
   "network_interfaces": "${NETSTAT}",
   "gpu": "${GPU}",
-  "top_processes": "${PROCS}",
-  "open_ports": "${PORTS}"
 }
 EOF
 }
-export -f get_stats
-PORT=6223
+if [[ "$1" == "--run-stats" ]]; then
+  get_stats
+  exit 0
+fi
+PORT=5023
 echo "Starting monitor server on 0.0.0.0:${PORT}"
 while true; do
-  socat -T60 TCP-LISTEN:${PORT},reuseaddr,fork SYSTEM:"/bin/bash -c get_stats"
+  socat -T60 TCP-LISTEN:${PORT},reuseaddr,fork SYSTEM:"/bin/bash /root/mon.sh --run-stats"
 done
