@@ -9,6 +9,7 @@ get_stats() {
   PORTS=$(ss -tuln | awk 'NR>1 {print $1":"$5}' | paste -sd "," -)
   NETSTAT=$(ip -4 addr show | grep inet | awk '{print $2}' | paste -sd "," -)
   GPU=$(lspci 2>/dev/null | grep -i vga | awk -F': ' '{print $2}' | paste -sd "," -)
+   echo -e "HTTP/1.1 200 OK\nContent-Type: application/json\n"
 
   cat <<EOF
 {
@@ -26,9 +27,9 @@ get_stats() {
 }
 EOF
 }
-
+export -f get_stats
 PORT=6223
 echo "Starting monitor server on 0.0.0.0:${PORT}"
 while true; do
-  socat -T60 TCP-LISTEN:${PORT},reuseaddr,fork SYSTEM:"/bin/bash -c 'get_stats'"
+  socat -T60 TCP-LISTEN:${PORT},reuseaddr,fork SYSTEM:"/bin/bash -c get_stats"
 done
