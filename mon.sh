@@ -55,7 +55,7 @@ if ! command -v socat >/dev/null 2>&1; then
   echo "socat not found. install socat (e.g., yum install socat -y / apt install socat -y)" >&2
   exit 2
 fi
-PORT=5023
+PORT=6223
 echo "Starting monitor server on 0.0.0.0:${PORT} - each connection executes: ${0} get"
 SELF="$(readlink -f "$0")"
 exec socat -T60 TCP-LISTEN:${PORT},reuseaddr,fork SYSTEM:"/bin/bash -c '${SELF} get'"
